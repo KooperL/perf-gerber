@@ -1,0 +1,469 @@
+:root {
+  --bg-dark: #0a0e14;
+  --bg-panel: #121820;
+  --border: #2a3441;
+  --grid-line: #1a2332;
+  --grid-dot: #3a4a5a;
+  --accent: #00ff88;
+  --accent-dim: #00aa55;
+  --text: #e0e6ed;
+  --text-dim: #8896a8;
+  --track-bottom: #a855f7;
+  --track-top: #ff8800;
+  --pad: #c0c8d0;
+  --hole: #0a0e14;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+  background: var(--bg-dark);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  grid-template-rows: 60px 1fr 50px;
+  height: 100vh;
+  gap: 1px;
+  background: var(--border);
+  position: relative;
+}
+
+.container.left-collapsed {
+  grid-template-columns: 0px 1fr 280px;
+}
+
+.container.right-collapsed {
+  grid-template-columns: 280px 1fr 0px;
+}
+
+.container.left-collapsed.right-collapsed {
+  grid-template-columns: 0px 1fr 0px;
+}
+
+header {
+  grid-column: 1 / -1;
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 2px solid var(--accent);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  color: var(--accent);
+  text-transform: uppercase;
+  animation: flicker 3s infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+.header-info {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.sidebar {
+  background: var(--bg-panel);
+  padding: 20px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+  padding: 0;
+  overflow: hidden;
+}
+
+.panel-toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 60px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.panel-toggle:hover {
+  background: var(--border);
+  color: var(--accent);
+}
+
+.panel-toggle-left {
+  left: 280px;
+  border-left: none;
+}
+
+.panel-toggle-left.collapsed {
+  left: 0px;
+}
+
+.panel-toggle-right {
+  right: 280px;
+  border-right: none;
+}
+
+.panel-toggle-right.collapsed {
+  right: 0px;
+}
+
+.mouse-hint {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+.layer-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.layer-toggle:hover {
+  background: var(--border);
+}
+
+.layer-toggle input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.layer-toggle label {
+  cursor: pointer;
+  flex: 1;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.layer-indicator {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.radio-option label {
+  cursor: pointer;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.sidebar h3 {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.control-group {
+  margin-bottom: 24px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input[type="number"], select {
+  width: 100%;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+input[type="number"]:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.1);
+}
+
+.tool-button {
+  width: 100%;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tool-button:hover {
+  background: var(--border);
+  border-color: var(--accent-dim);
+}
+
+.tool-button.active {
+  background: var(--accent);
+  color: var(--bg-dark);
+  border-color: var(--accent);
+  font-weight: bold;
+}
+
+.action-button {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  color: var(--bg-dark);
+  padding: 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.action-button:hover {
+  background: #00ffaa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+}
+
+.action-button.secondary {
+  background: var(--bg-dark);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.action-button.secondary:hover {
+  background: var(--border);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.canvas-container {
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#canvas {
+  cursor: crosshair;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+opacity: 0;
+transform: scale(0.95);
+  }
+  to {
+opacity: 1;
+transform: scale(1);
+  }
+}
+
+footer {
+  grid-column: 1 / -1;
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+
+.status {
+  display: flex;
+  gap: 24px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-panel {
+  background: var(--bg-dark);
+  padding: 12px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+  border-left: 3px solid var(--accent);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.inline-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tool-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tool-selector.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.tool-selector.active .tool-name {
+  color: var(--bg-dark);
+  font-weight: bold;
+}
+
+.tool-selector.active .tool-btn {
+  background: var(--bg-dark);
+  color: var(--accent);
+  border-color: var(--bg-dark);
+}
+
+.tool-name {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+  flex: 1;
+}
+
+.tool-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.tool-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  user-select: none;
+}
+
+.tool-btn:hover {
+  background: var(--border);
+  border-color: var(--accent-dim);
+}
+
+.color-indicator {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border);
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--grid-dot);
+}
