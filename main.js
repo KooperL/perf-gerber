@@ -469,7 +469,7 @@ const app = {
       bottomTrackInfoSelector.style.display = 'none';
       
       // Update export info to show only top layer
-      exportLayers.innerHTML = '• Top copper (.gtl)<br>';
+      exportLayers.innerHTML = '• Top copper (.gtl)<br>• Top solder mask (.gts)<br>';
       
       // If currently on bottom track tool, switch to top track
       if (this.tool === 'bottomTrack') {
@@ -481,7 +481,7 @@ const app = {
       showBottomToggle.style.display = 'flex';
       
       // Update export info to show both layers
-      exportLayers.innerHTML = '• Bottom copper (.gbl)<br>• Top copper (.gtl)<br>';
+      exportLayers.innerHTML = '• Bottom copper (.gbl)<br>• Bottom solder mask (.gbs)<br>• Top copper (.gtl)<br>• Top solder mask (.gts)<br>';
     }
   },
 
@@ -499,9 +499,13 @@ const app = {
     // Add top copper layer (always present)
     zip.file(`${projectName}.gtl`, this.generateCopperLayer('top'));
     
+    // Add top solder mask (always present)
+    zip.file(`${projectName}.gts`, this.generateSolderMask('top'));
+    
     // Add bottom copper layer only if 2-layer board
     if (this.layerCount === 2) {
       zip.file(`${projectName}.gbl`, this.generateCopperLayer('bottom'));
+      zip.file(`${projectName}.gbs`, this.generateSolderMask('bottom'));
     }
     
     // Add drill file
@@ -566,6 +570,71 @@ const app = {
       gerber += `X${x1}Y${y1}D02*\n`;
       gerber += `X${x2}Y${y2}D01*\n`;
     });
+    
+    // Footer
+    gerber += 'M02*\n';
+    
+    return gerber;
+  },
+
+  generateSolderMask(layer) {
+    // Gerber RS-274X format - Solder Mask Layer
+    // Solder mask covers the ENTIRE board, with openings only at pads
+    let gerber = '';
+    const layerName = layer === 'bottom' ? 'Bottom' : 'Top';
+    
+    // Header
+    gerber += `G04 PerfBoard Designer - ${layerName} Solder Mask*\n`;
+    gerber += `G04 Board: ${this.gridWidth}x${this.gridHeight} @ ${this.spacing}mm spacing*\n`;
+    gerber += '%FSLAX36Y36*%\n';
+    gerber += '%MOMM*%\n';
+    
+    // Aperture definitions
+    const maskClearance = 0.1; // 0.1mm clearance around pads
+    const maskOpening = ((this.padRadius * 2) + (maskClearance * 2)).toFixed(4);
+    gerber += `%ADD10C,${maskOpening}*%\n`; // Pad opening
+    gerber += `%ADD11R,0.0500X0.0500*%\n`; // Small rectangle for filling
+    
+    // Set units and format
+    gerber += 'G01*\n';
+    gerber += 'G75*\n';
+    
+    // First, draw the entire board area as DARK (covered with solder mask)
+    gerber += '%LPD*%\n'; // Dark polarity
+    gerber += 'G54D11*\n';
+    
+    // Calculate board dimensions with margin
+    const margin = 2; // 2mm margin
+    const boardWidth = (this.gridWidth - 1) * this.spacing + margin * 2;
+    const boardHeight = (this.gridHeight - 1) * this.spacing + margin * 2;
+    const offsetX = -margin;
+    const offsetY = -margin;
+    
+    // Fill the entire board area with solder mask using a region
+    gerber += 'G36*\n'; // Start region
+    const x1 = (offsetX * 1000000).toFixed(0);
+    const y1 = (offsetY * 1000000).toFixed(0);
+    const x2 = ((offsetX + boardWidth) * 1000000).toFixed(0);
+    const y2 = ((offsetY + boardHeight) * 1000000).toFixed(0);
+    
+    gerber += `X${x1}Y${y1}D02*\n`;
+    gerber += `X${x2}Y${y1}D01*\n`;
+    gerber += `X${x2}Y${y2}D01*\n`;
+    gerber += `X${x1}Y${y2}D01*\n`;
+    gerber += `X${x1}Y${y1}D01*\n`;
+    gerber += 'G37*\n'; // End region
+    
+    // Now, create CLEAR openings for all pads
+    gerber += '%LPC*%\n'; // Clear polarity - removes solder mask
+    gerber += 'G54D10*\n';
+    
+    for (let row = 0; row < this.gridHeight; row++) {
+      for (let col = 0; col < this.gridWidth; col++) {
+        const x = (col * this.spacing * 1000000).toFixed(0);
+        const y = (row * this.spacing * 1000000).toFixed(0);
+        gerber += `X${x}Y${y}D03*\n`;
+      }
+    }
     
     // Footer
     gerber += 'M02*\n';
@@ -661,10 +730,13 @@ const app = {
     
     const filesIncluded = this.layerCount === 1
       ? `- .gtl - Top copper layer (orange traces and pads)
+- .gts - Top solder mask (pad openings)
 - .drl - Excellon drill file (marked hole positions only)
 - .gko - Board outline (cutting edge)`
       : `- .gbl - Bottom copper layer (purple traces and pads)
+- .gbs - Bottom solder mask (pad openings)
 - .gtl - Top copper layer (orange traces and pads)
+- .gts - Top solder mask (pad openings)
 - .drl - Excellon drill file (marked hole positions only)
 - .gko - Board outline (cutting edge)`;
 
