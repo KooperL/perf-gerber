@@ -593,39 +593,13 @@ const app = {
     const maskClearance = 0.1; // 0.1mm clearance around pads
     const maskOpening = ((this.padRadius * 2) + (maskClearance * 2)).toFixed(4);
     gerber += `%ADD10C,${maskOpening}*%\n`; // Pad opening
-    gerber += `%ADD11R,0.0500X0.0500*%\n`; // Small rectangle for filling
     
     // Set units and format
     gerber += 'G01*\n';
     gerber += 'G75*\n';
     
-    // First, draw the entire board area as DARK (covered with solder mask)
-    gerber += '%LPD*%\n'; // Dark polarity
-    gerber += 'G54D11*\n';
-    
-    // Calculate board dimensions with margin
-    const margin = 2; // 2mm margin
-    const boardWidth = (this.gridWidth - 1) * this.spacing + margin * 2;
-    const boardHeight = (this.gridHeight - 1) * this.spacing + margin * 2;
-    const offsetX = -margin;
-    const offsetY = -margin;
-    
-    // Fill the entire board area with solder mask using a region
-    gerber += 'G36*\n'; // Start region
-    const x1 = (offsetX * 1000000).toFixed(0);
-    const y1 = (offsetY * 1000000).toFixed(0);
-    const x2 = ((offsetX + boardWidth) * 1000000).toFixed(0);
-    const y2 = ((offsetY + boardHeight) * 1000000).toFixed(0);
-    
-    gerber += `X${x1}Y${y1}D02*\n`;
-    gerber += `X${x2}Y${y1}D01*\n`;
-    gerber += `X${x2}Y${y2}D01*\n`;
-    gerber += `X${x1}Y${y2}D01*\n`;
-    gerber += `X${x1}Y${y1}D01*\n`;
-    gerber += 'G37*\n'; // End region
-    
-    // Now, create CLEAR openings for all pads
-    gerber += '%LPC*%\n'; // Clear polarity - removes solder mask
+    // Flash pad openings at every pad position - manufacturer treats whole board as masked by default
+    gerber += '%LPD*%\n';
     gerber += 'G54D10*\n';
     
     for (let row = 0; row < this.gridHeight; row++) {
