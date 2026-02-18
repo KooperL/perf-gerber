@@ -627,8 +627,8 @@ const app = {
     drill += `; Marked drill points: ${this.drills.size}\n`;
     drill += 'METRIC,TZ\n';
     
-    // Tool definition - standard perfboard hole size
-    const holeDiameter = (this.padRadius * 2 * 0.5).toFixed(4); // 50% of pad diameter
+    // Tool definition - standard perfboard hole size (0.8mm)
+    const holeDiameter = (0.8).toFixed(4);
     drill += `T1C${holeDiameter}\n`;
     drill += '%\n';
     
@@ -730,7 +730,7 @@ Board Specifications:
 - Hole Spacing: ${this.spacing}mm
 - Board Dimensions: ${boardWidthMM}mm × ${boardHeightMM}mm (with 2mm margin)
 - Pad Diameter: ${(this.padRadius * 2).toFixed(2)}mm
-- Hole Diameter: ${(this.padRadius * 2 * 0.5).toFixed(2)}mm
+- Hole Diameter: 0.80mm
 - Track Width: ${this.trackWidth.toFixed(2)}mm
 - Layer Count: ${this.layerCount}
 - Bottom Tracks: ${this.bottomTracks.length}
